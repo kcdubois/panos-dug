@@ -1,11 +1,16 @@
 FROM python:3.10.5-slim
 
-RUN pip install pipenv
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
-COPY Pipfile Pipfile.lock ./
-RUN pipenv install --system
+COPY requirements.dev.txt .
+RUN pip install -r requirements.dev.txt
 
-COPY worker .
+COPY setup.py .
+COPY worker ./worker
 
-CMD [ "app.py" ]
+RUN pip install -e .
+
+ENTRYPOINT [ "panos-worker" ]
+CMD [ "run" ]
