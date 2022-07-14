@@ -17,3 +17,8 @@ def hello_world():
     click.echo("Worker service started...")
     click.echo(f"Configured with Panorama {app_settings.panos_host}")
     click.confirm("Press any key to exit.")
+
+
+@run.command
+def server():
+    raise NotImplementedError

@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     panos_username: str
     panos_password: str
     panos_userid_timeout: int = 60
+    rabbitmq_host: str = "rabbitmq"
+    rabbitmq_user: str = "guest"
+    rabbitmq_password: str = "guest"
+    rabbitmq_exchange_name: str = "panos_worker"
+    rabbitmq_queue_name: str = "userid"
 
 
 app_settings = Settings()
