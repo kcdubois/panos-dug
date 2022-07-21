@@ -8,6 +8,8 @@ from ipaddress import IPv4Address
 import logging
 
 from panos import firewall
+from panos.errors import PanDeviceXapiError
+
 from worker.settings import app_settings
 
 
@@ -69,9 +71,8 @@ def login_user(
         logging.info(f"Creating login mapping {user}/{ip}/{timeout}")
 
         handler.userid.login(user, str(ip), login_timeout)
-    except Exception as e:
+    except PanDeviceXapiError as e:
         logger.exception(f"An error occured while logging in a user. {e}")
-        raise
 
 
 def logout_user(handler: firewall.Firewall, user: str, ip: IPv4Address):

@@ -4,10 +4,15 @@ services:
   worker:
     build:
       context: .
+      dockerfile: Dockerfile.dev
     environment:
       PANOS_HOST: '192.168.2.133'
       PANORAMA_USERNAME: 'admin'
       PANORAMA_PASSWORD: 'Paloalto1!'
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      RABBITMQ_QUEUE_NAME: userid
     volumes:
       - ./worker:/app
   
