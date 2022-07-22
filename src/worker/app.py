@@ -20,7 +20,22 @@ def run():
     logging.basicConfig(level=logging.DEBUG)
     try:
         LOGGER.info("Starting the RabbitMQ consumer.")
-        fsm.consume_message()
+        pan_service = paloalto.PanService(
+            app_settings.panos_host,
+            app_settings.panos_username,
+            app_settings.panos_password,
+            app_settings.panos_port
+        )
+
+        consumer = fsm.SimpleConsumer(
+            app_settings.rabbitmq_host,
+            app_settings.rabbitmq_user,
+            app_settings.rabbitmq_password,
+            app_settings.rabbitmq_queue_name,
+            pan_service
+        )
+
+        consumer.run()
     finally:
         LOGGER.info("Stopped the RabbitMQ consumer.")
 

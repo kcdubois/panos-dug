@@ -1,0 +1,20 @@
+[project]
+name = "panos-worker"
+version = "0.1"
+authors = [
+  { name="Kevin C-Dubois", email="kcdubois@outlook.com" },
+]
+description = "PAN-OS consumer service using RabbitMQ"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.urls]
+"Homepage" = "https://github.com/kcdubois/panos-uid-worker"
+
+[project.scripts]
+panos-worker = "worker.app:cli"
+
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

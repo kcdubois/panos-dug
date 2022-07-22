@@ -9,7 +9,6 @@ import pika
 from pydantic import ValidationError
 
 from worker.models import Message
-from worker import paloalto
 
 
 LOGGER = logging.getLogger(__name__)
@@ -20,14 +19,14 @@ class StateUnknownError(Exception):
 
 
 class SimpleConsumer:
-    STATES = (
-        ("userid.login", "login"),
-        ("userid.logout", "logout"),
-        ("userid.tag", "tag"),
-        ("userid.untag", "untag"),
-    )
+    STATES = {
+        "userid.login": "login",
+        "userid.logout": "logout",
+        "userid.tag_user": "tag_user",
+        "userid.untag_user": "untag_user",
+    }
 
-    def __init__(self, host, username, password, queue_name):
+    def __init__(self, host, username, password, queue_name, service):
         connection_parameters = pika.ConnectionParameters(
             host=host,
             credentials=pika.PlainCredentials(username, password)
@@ -36,18 +35,15 @@ class SimpleConsumer:
         self._connection = pika.BlockingConnection(connection_parameters)
         self._channel = self._connection.channel()
         self._channel.basic_consume(queue_name, self.on_message)
+        self._service = service
 
     def _deserialize(self, body: bytes):
         payload = json.loads(body.decode())
         return Message(**payload)
 
     def _dispatch_event(self, message: Message):
-        method, = (state[1] for state in self.STATES
-                   if state[0 == message.event])
-
-        LOGGER.info(f"Method found: {method}")
-
-        getattr(paloalto, (self.STATES[method]))(message)
+        func = getattr(self._service, self.STATES[message.event])
+        func(message.user, message.ip)
 
     def on_message(self, channel, method_frame, header_frame, body):
         """ Message processing from RAbbitMQ queue."""
@@ -55,7 +51,7 @@ class SimpleConsumer:
         try:
             message = self._deserialize(body)
 
-            if message.event not in (state[0] for state in self.STATES):
+            if message.event not in self.STATES:
                 raise StateUnknownError
 
             self._dispatch_event(message)
